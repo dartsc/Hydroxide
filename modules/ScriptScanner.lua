@@ -24,8 +24,13 @@ local function scan(query)
                 script.Name:lower():find(query) then
 
                 local success, closure = pcall(getScriptClosure, script)
-                if success and closure and pcall(function() getsenv(script) end) then
-                    scripts[script] = LocalScript.new(script)
+                if success and closure then
+                    local senvSuccess = pcall(function() getsenv(script) end)
+                    if senvSuccess then
+                        scripts[script] = LocalScript.new(script)
+                    else
+                        print("Error getting script environment for:", script)
+                    end
                 else
                     print("Error in getScriptClosure:", closure)
                 end

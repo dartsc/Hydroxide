@@ -6,7 +6,7 @@ local requiredMethods = {
     ["getSenv"] = true,
     ["getProtos"] = true,
     ["getConstants"] = true,
-    ["getScriptClosure"] = true,
+    ["getScriptBytecode"] = true,
     ["isXClosure"] = true
 }
 
@@ -22,7 +22,7 @@ local function scan(query)
                 not scripts[script] and 
                 script:IsA("LocalScript") and 
                 script.Name:lower():find(query) and
-                getScriptClosure(script) and
+                getScriptBytecode(script) and
                 pcall(function() getsenv(script) end)
             then
                 scripts[script] = LocalScript.new(script)

@@ -1,6 +1,6 @@
 ## Script
 ```lua
-local owner = " DzGak"
+local owner = "DzGak"
 local branch = "revision"
 
 local function webImport(file)

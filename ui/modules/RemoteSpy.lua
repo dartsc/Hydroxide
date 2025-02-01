@@ -451,6 +451,9 @@ function Log.adjust(log)
     local labelWidth = iconPosition + 21
 
     logInstance.Calls.Size = UDim2.new(0, callWidth, 1, 0)
+    if (remoteClassName == "UnreliableRemoteEvent") then
+        logIcon.Size = UDim2.fromScale(2, 2)
+    end
     logIcon.Position = UDim2.new(0, iconPosition, 0.5, ((remoteClassName == "RemoteEvent") and -9) or -7)
     logInstance.Label.Position = UDim2.new(0, labelWidth, 0, 0)
     logInstance.Label.Size = UDim2.new(1, -labelWidth, 1, 0)

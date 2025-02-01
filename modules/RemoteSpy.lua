@@ -52,7 +52,7 @@ end
 
 local nmcTrampoline
 nmcTrampoline = hookMetaMethod(game, "__namecall", function(...)
-    local instance = ...
+    local instance = ... 
 
     if typeof(instance) ~= "Instance" then
         return nmcTrampoline(...)

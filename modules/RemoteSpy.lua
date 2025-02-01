@@ -11,7 +11,7 @@ local requiredMethods = {
     ["getMetatable"] = true,
     ["setClipboard"] = true,
     ["getNamecallMethod"] = true,
-    ["getCallingScript"] = true,
+    ["getCallingScript"] = true
 }
 
 local remoteMethods = {
@@ -23,6 +23,7 @@ local remoteMethods = {
 
 local remotesViewing = {
     RemoteEvent = true,
+    UnreliableRemoteEvent = true,
     RemoteFunction = false,
     BindableEvent = false,
     BindableFunction = false
@@ -30,6 +31,7 @@ local remotesViewing = {
 
 local methodHooks = {
     RemoteEvent = Instance.new("RemoteEvent").FireServer,
+    UnreliableRemoteEvent = Instance.new('UnreliableRemoteEvent').FireServer,
     RemoteFunction = Instance.new("RemoteFunction").InvokeServer,
     BindableEvent = Instance.new("BindableEvent").Fire,
     BindableFunction = Instance.new("BindableFunction").Invoke
@@ -51,7 +53,7 @@ end
 local nmcTrampoline
 nmcTrampoline = hookMetaMethod(game, "__namecall", function(...)
     local instance = ...
-    
+
     if typeof(instance) ~= "Instance" then
         return nmcTrampoline(...)
     end
@@ -63,11 +65,11 @@ nmcTrampoline = hookMetaMethod(game, "__namecall", function(...)
     elseif method == "invokeServer" then
         method = "InvokeServer"
     end
-        
+
     if remotesViewing[instance.ClassName] and instance ~= remoteDataEvent and remoteMethods[method] then
         local remote = currentRemotes[instance]
         local vargs = {select(2, ...)}
-            
+
         if not remote then
             remote = Remote.new(instance)
             currentRemotes[instance] = remote
@@ -102,7 +104,8 @@ end)
 local pcall = pcall
 
 local function checkPermission(instance)
-    if (instance.ClassName) then end
+    if (instance.ClassName) then
+    end
 end
 
 for _name, hook in pairs(methodHooks) do
@@ -113,10 +116,12 @@ for _name, hook in pairs(methodHooks) do
         if typeof(instance) ~= "Instance" then
             return originalMethod(...)
         end
-                
+
         do
             local success = pcall(checkPermission, instance)
-            if (not success) then return originalMethod(...) end
+            if (not success) then
+                return originalMethod(...)
+            end
         end
 
         if instance.ClassName == _name and remotesViewing[instance.ClassName] and instance ~= remoteDataEvent then
@@ -128,16 +133,16 @@ for _name, hook in pairs(methodHooks) do
                 currentRemotes[instance] = remote
             end
 
-            local remoteIgnored = remote.Ignored 
+            local remoteIgnored = remote.Ignored
             local argsIgnored = remote:AreArgsIgnored(vargs)
-            
+
             if eventSet and (not remoteIgnored and not argsIgnored) then
                 local call = {
                     script = getCallingScript((PROTOSMASHER_LOADED ~= nil and 2) or nil),
                     args = vargs,
                     func = getInfo(3).func
                 }
-    
+
                 remote:IncrementCalls(call)
                 remoteDataEvent:Fire(instance, call)
             end
@@ -146,7 +151,7 @@ for _name, hook in pairs(methodHooks) do
                 return
             end
         end
-        
+
         return originalMethod(...)
     end))
 

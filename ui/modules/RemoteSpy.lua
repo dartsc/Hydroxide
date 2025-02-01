@@ -1008,7 +1008,7 @@ end)
 
 Methods.ConnectEvent(function(remoteInstance, callInfo)
     if not removed[remoteInstance] then
-        local remote = currentRemotes[remoteInstance] 
+        local remote = currentRemotes[remoteInstance]
         local log = currentLogs[remoteInstance] or Log.new(remote)
 
         log:IncrementCalls(callInfo)

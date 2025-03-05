@@ -61,6 +61,7 @@ local icons = {
     ignore = "rbxassetid://4842578510",
     unignore = "rbxassetid://4842578818",
     RemoteEvent = "rbxassetid://4229806545",
+    UnreliableRemoteEvent = "rbxassetid://86005437639724",
     RemoteFunction = "rbxassetid://4229810474",
     BindableEvent = "rbxassetid://4229809371",
     BindableFunction = "rbxassetid://4229807624"
@@ -116,11 +117,15 @@ local removeContextSelected = ContextMenuButton.new("rbxassetid://4702831188", "
 
 local removeConditionContextSelected = ContextMenuButton.new("rbxassetid://4702831188", "Remove Conditions")
 
-local remoteListMenu = ContextMenu.new({ pathContext, conditionContext, clearContext, ignoreContext, blockContext, removeContext })
-local remoteListMenuSelected = ContextMenu.new({ pathContextSelected, clearContextSelected, ignoreContextSelected, unignoreContextSelected, blockContextSelected, unblockContextSelected, removeContextSelected })
-local remoteLogsMenu = ContextMenu.new({ scriptContext, callingScriptContext, spyClosureContext, repeatCallContext, viewAsHexContext })
-local remoteConditionMenu = ContextMenu.new({ removeConditionContext })
-local remoteConditionMenuSelected = ContextMenu.new({ removeConditionContextSelected })
+local remoteListMenu = ContextMenu.new({pathContext, conditionContext, clearContext, ignoreContext, blockContext,
+                                        removeContext})
+local remoteListMenuSelected = ContextMenu.new({pathContextSelected, clearContextSelected, ignoreContextSelected,
+                                                unignoreContextSelected, blockContextSelected, unblockContextSelected,
+                                                removeContextSelected})
+local remoteLogsMenu = ContextMenu.new({scriptContext, callingScriptContext, spyClosureContext, repeatCallContext,
+                                        viewAsHexContext})
+local remoteConditionMenu = ContextMenu.new({removeConditionContext})
+local remoteConditionMenuSelected = ContextMenu.new({removeConditionContextSelected})
 
 local function checkCurrentIgnored()
     local selectedRemote = (selected.remoteLog or selected.logContext).Remote
@@ -128,7 +133,8 @@ local function checkCurrentIgnored()
     LogsButtons.Ignore.Label.Text = (selectedRemote.Ignored and "Unignore") or "Ignore"
     LogsButtons.Ignore.Icon.Image = (selectedRemote.Ignored and icons.unignore) or icons.ignore
 
-    local newWidth = TextService:GetTextSize((selectedRemote.Ignored and "Unignore") or "Ignore", 18, "SourceSans", constants.textWidth).X + 30
+    local newWidth = TextService:GetTextSize((selectedRemote.Ignored and "Unignore") or "Ignore", 18, "SourceSans",
+                         constants.textWidth).X + 30
 
     LogsButtons.Ignore.Size = UDim2.new(0, newWidth, 0, 20)
 end
@@ -139,7 +145,8 @@ local function checkCurrentBlocked()
     LogsButtons.Block.Label.Text = (selectedRemote.Blocked and "Unblock") or "Block"
     LogsButtons.Block.Icon.Image = (selectedRemote.Blocked and icons.unblock) or icons.block
 
-    local newWidth = TextService:GetTextSize((selectedRemote.Blocked and "Unblock") or "Block", 18, "SourceSans", constants.textWidth).X + 30
+    local newWidth = TextService:GetTextSize((selectedRemote.Blocked and "Unblock") or "Block", 18, "SourceSans",
+                         constants.textWidth).X + 30
 
     LogsButtons.Block.Size = UDim2.new(0, newWidth, 0, 20)
 end
@@ -147,7 +154,7 @@ end
 local Condition = {}
 function Condition.new(remote, status, index, value, type)
     local condition = {}
-    local instance = Assets.ConditionPod:Clone() 
+    local instance = Assets.ConditionPod:Clone()
     local content = instance.Content
     local identifiers = instance.Identifiers
     local button = ListButton.new(instance, remoteConditions)
@@ -181,11 +188,11 @@ function Condition.new(remote, status, index, value, type)
             table.insert(selected.conditions, condition)
         end
     end)
-    
+
     if byType then
         instance.Identifiers.ByType.Visible = false
-    end 
-    
+    end
+
     identifiers.ByType.Visible = type ~= nil
     identifiers.Status.Image = (status == "Ignore" and icons.ignore) or icons.block
     identifiers.Status.Border.Image = identifiers.Status.Image
@@ -281,10 +288,16 @@ function Log.new(remote)
     local remoteInstanceName = remoteInstance.Name
     local remoteClassName = remoteInstance.ClassName
     local listButton = ListButton.new(button, remoteList)
-    
-    local normalAnimation = TweenService:Create(button.Label, constants.fadeLength, { TextColor3 = constants.normalColor })
-    local blockAnimation = TweenService:Create(button.Label, constants.fadeLength, { TextColor3 = constants.blockedColor })
-    local ignoreAnimation = TweenService:Create(button.Label, constants.fadeLength, { TextColor3 = constants.ignoredColor })
+
+    local normalAnimation = TweenService:Create(button.Label, constants.fadeLength, {
+        TextColor3 = constants.normalColor
+    })
+    local blockAnimation = TweenService:Create(button.Label, constants.fadeLength, {
+        TextColor3 = constants.blockedColor
+    })
+    local ignoreAnimation = TweenService:Create(button.Label, constants.fadeLength, {
+        TextColor3 = constants.ignoredColor
+    })
 
     button.Name = remoteInstanceName
     button.Label.Text = remoteInstanceName
@@ -294,9 +307,9 @@ function Log.new(remote)
         if selected.remoteLog then
             remoteLogs:Clear()
         end
-        
+
         local nameLength = TextService:GetTextSize(remoteInstanceName, 18, "SourceSans", constants.textWidth).X + 20
-        
+
         selected.remoteLog = log
 
         for _i, call in pairs(remote.Logs) do
@@ -319,8 +332,7 @@ function Log.new(remote)
             if #remote.Logs > 400 then
                 MessageBox.Show("Warning",
                     "This remote seems to have a lot of calls, opening this may cause your game to freeze for a few seconds.\n\nContinue?",
-                    MessageType.YesNo,
-                    viewLogs)
+                    MessageType.YesNo, viewLogs)
             else
                 viewLogs()
             end
@@ -370,13 +382,13 @@ local function createArg(instance, index, value)
 
     arg.Icon.Image = oh.Constants.Types[valueType]
     arg.Index.Text = index
-    
+
     if valueType == "table" then
         arg.Label.Text = toString(value)
     else
         arg.Label.Text = dataToString(value)
     end
-    
+
     arg.Label.TextColor3 = oh.Constants.Syntax[valueType]
     arg.Name = tostring(index)
     arg.Parent = instance.Contents
@@ -413,7 +425,7 @@ function ArgsLog.new(log, callInfo)
 
     button.Instance.Size = button.Instance.Size + UDim2.new(0, 0, 0, height)
 
-    return button 
+    return button
 end
 
 function Log.playIgnore(log)
@@ -434,11 +446,14 @@ function Log.adjust(log)
     local logIcon = logInstance.Icon
 
     local callWidth = TextService:GetTextSize(logInstance.Calls.Text, 18, "SourceSans", constants.textWidth).X + 10
-    local iconPosition = callWidth - (((remoteClassName == "RemoteEvent" or remoteClassName == "BindableEvent") and 4) or 0)
+    local iconPosition = callWidth -
+                             (((remoteClassName == "RemoteEvent" or remoteClassName == "UnreliableRemoteEvent" or
+                                 remoteClassName == "BindableEvent") and 4) or 0)
     local labelWidth = iconPosition + 21
 
     logInstance.Calls.Size = UDim2.new(0, callWidth, 1, 0)
-    logIcon.Position = UDim2.new(0, iconPosition, 0.5, (remoteClassName == "RemoteEvent" and -9) or -7)
+    logIcon.Position = UDim2.new(0, iconPosition, 0.5, ((remoteClassName == "RemoteEvent" or remoteClassName ==
+        "UnreliableRemoteEvent") and -9) or -7)
     logInstance.Label.Position = UDim2.new(0, labelWidth, 0, 0)
     logInstance.Label.Size = UDim2.new(1, -labelWidth, 1, 0)
 end
@@ -464,7 +479,7 @@ function Log.incrementCalls(log, callInfo)
     buttonInstance.Calls.Text = (calls < 10000 and calls) or "..."
 
     log:Adjust()
-    
+
     if selected.remoteLog == log then
         ArgsLog.new(log, callInfo)
         remoteLogs:Recalculate()
@@ -499,7 +514,7 @@ local function refreshLogs()
     remoteList:Recalculate()
 end
 
-for _i,flag in pairs(ListFlags:GetChildren()) do
+for _i, flag in pairs(ListFlags:GetChildren()) do
     if flag:IsA("Frame") then
         local check = CheckBox.new(flag)
 
@@ -620,7 +635,7 @@ NewConditionButtons.Add.MouseButton1Click:Connect(function()
             else
                 return MessageBox.Show("Error", "Your input does not match the type you selected", MessageType.OK)
             end
-        else 
+        else
             local success, result = pcall(loadstring("return " .. value))
 
             if valueType == "Value" then
@@ -720,7 +735,7 @@ blockContext:SetCallback(function()
     selected.logContext.Remote:Block()
 
     checkCurrentBlocked()
-    
+
     if selectedRemote.Blocked then
         selected.logContext:PlayBlock()
     elseif selectedRemote.Ignored then
@@ -837,7 +852,7 @@ scriptContext:SetCallback(function()
     local remotePath = getInstancePath(selectedRemote)
     local method
 
-    if remoteClassName == "RemoteEvent" then
+    if remoteClassName == "RemoteEvent" or remoteClassName == "UnreliableRemoteEvent" then
         method = "FireServer"
     elseif remoteClassName == "RemoteFunction" then
         method = "InvokeServer"
@@ -872,7 +887,7 @@ scriptContext:SetCallback(function()
                 v = toString(v)
             end
 
-            script = script .. ("local oh%s%d = %s\n"):format(variableName, i, v) 
+            script = script .. ("local oh%s%d = %s\n"):format(variableName, i, v)
             args = args .. ("oh%s%d, "):format(variableName, i)
         end
 
@@ -901,7 +916,8 @@ spyClosureContext:SetCallback(function()
         if result == false then
             MessageBox.Show("Already hooked", "You are already spying " .. selectedClosure.Name)
         elseif result == nil then
-            MessageBox.Show("Cannot hook", ('Cannot hook "%s" because there are no upvalues'):format(selectedClosure.Name))
+            MessageBox.Show("Cannot hook",
+                ('Cannot hook "%s" because there are no upvalues'):format(selectedClosure.Name))
         end
     end
 end)
@@ -909,9 +925,9 @@ end)
 repeatCallContext:SetCallback(function()
     local remoteInstance = selected.remoteLog.Remote.Instance
     local remoteClassName = remoteInstance.ClassName
-    local method 
+    local method
 
-    if remoteClassName == "RemoteEvent" then
+    if remoteClassName == "RemoteEvent" or remoteClassName == "UnreliableRemoteEvent" then
         method = "FireServer"
     elseif remoteClassName == "RemoteFunction" then
         method = "InvokeServer"
@@ -969,24 +985,24 @@ end)
 
 conditionStatus:SetCallback(function(_dropdown, selected)
     local iconCondition = (selected.Name == "Ignore" and icons.ignore) or icons.block
-    local icon = NewConditionContent.Status.Icon 
+    local icon = NewConditionContent.Status.Icon
 
     icon.Image = iconCondition
     icon.Border.Image = iconCondition
 end)
 
 conditionType:SetCallback(function(_dropdown, selected)
-    local icon = NewConditionContent.Type.Icon 
+    local icon = NewConditionContent.Type.Icon
     local typeIcons = oh.Constants.Types
     local iconCondition = typeIcons[selected.Name] or typeIcons["userdata"]
-    
+
     icon.Image = iconCondition
     icon.Border.Image = iconCondition
 end)
 
 conditionValueType:SetCallback(function(_dropdown, selected)
     local iconCondition = (selected.Name == "Type" and icons.type) or oh.Constants.Types["integral"]
-    local icon = NewConditionContent.ValueType.Icon 
+    local icon = NewConditionContent.ValueType.Icon
 
     icon.Image = iconCondition
     icon.Border.Image = iconCondition
